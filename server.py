@@ -5,12 +5,16 @@
 from flask import Flask, render_template
 from doc2vec import *
 import sys
+from jinja2 import Template
 
 app = Flask(__name__)
 
 @app.route("/")
 def articles():
     """Show a list of article titles"""
+    article_titles = [article[1] for article in articles]
+
+    return render_template('articles.html', article_titles=article_titles)
 
 
 @app.route("/article/<topic>/<filename>")
@@ -19,6 +23,17 @@ def article(topic,filename):
     Show an article with relative path filename. Assumes the BBC structure of
     topic/filename.txt so our URLs follow that.
     """
+    for article in articles:
+        if article[0] == filename:
+            article_paragraphs = article[2].split('\n')
+            break
+    # TODO make the links correct
+    recommended_links = [topic+article[0] for article in recommended(filename, articles, 5)]
+    recommended_titles = [article[1] for article in recommended(filename, articles, 5)]
+
+    return render_template('article.html', article_paragraphs=article_paragraphs,
+                                               recommended_links=recommended_links,
+                                               recommended_titles=recommended_titles)
 
 # initialization
 i = sys.argv.index('server:app')

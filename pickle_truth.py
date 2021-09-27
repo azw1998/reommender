@@ -49,11 +49,11 @@ links = fetch_article_list("localhost")
 output = open('articles.pkl', 'wb')
 pickle.dump(links, output)
 output.close()
-print("Pickled list of {length} article links".format(length=len(links)))
+print "Pickled list of %d article links" % len(links)
 
 # get a sampling of articles
 articles = fetch_sample_articles("localhost", artlist)
 output = open('recommended.pkl', 'wb')
 pickle.dump(articles, output)
 output.close()
-print("Pickled list of {length} article pages each with 5 recommended links".format(length=len(articles)))
+print "Pickled list of %d article pages each with 5 recommended links" % len(articles)

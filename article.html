@@ -27,11 +27,13 @@
 <div class="grid">
     <div class="col-2-3">
         <h2>TITLE</h2>
-        TEXT WITH P TAGS AROUND PARAGRAPHS
+        {% for paragraph in article_paragraphs%}
+            <p>{paragraph}</p>
     </div>
     <div class="col-1-3">
         <p><b>Similar articles</b></p>
-        LIST OF RECOMMENDED ARTICLE TITLES/LINKS
+        {% for title in recommended_titles %}
+            <a href="Google">{{title}}</a>
     </div>
 </div>
 

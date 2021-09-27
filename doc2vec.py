@@ -62,17 +62,17 @@ def load_glove(filename):
     should not matter; read vectors of any length.
     When computing the vector for each document, use just the text, not the text and title.
     """
-    with open(filename, 'r') as f:
-        text = f.read()
-    lines = text.split('\n')
+    glove = {}
     word_list = []
     vector_list = []
-    for line in lines:
-        line_elements = line.split(' ')
-        word_list.append(line_elements[0])
-        vector_list.append([float(num) for num in line_elements[1:]])
+    with open(filename, 'r') as file:
+        for line in file:
+            line_elements = line.split(' ')
+            word = line_elements[0]
+            vector = [float(num) for num in line_elements[1:]]
+            glove[word] = vector
 
-    return {word_list[i]: np.array(vector_list[i]) for i in range(len(words))}
+    return glove
 
 
 def filelist(root):
@@ -122,10 +122,22 @@ def load_articles(articles_dirname, gloves):
     The filename is fully-qualified name of the text file including
     the path to the root of the corpus passed in on the command line.
     """
+    output = []
     filenames = filelist(articles_dirname)
-    txt_filenames = [filename for filename in filenames if filename[:-3] == 'txt']
-    #TODO get title of filename and get text minus title
-    return [[filename, get_text(filename), doc2vec(get_text(filename), gloves)] for filename in txt_filenames]
+    txt_filenames = [filename for filename in filenames if filename[:-4] == '.txt']
+
+    for filename in txt_filenames:
+        with open(filename, 'r') as f:
+            file_content = f.read().split('\n', 1)
+            title = file_content[0]
+            text = file_content[1]
+            output.append([filename,
+                           title,
+                           text,
+                           doc2vec(text, gloves)])
+
+
+    return output
 
 
 def doc2vec(text, gloves):
@@ -138,7 +150,7 @@ def doc2vec(text, gloves):
     sum = np.zeroes(len(gloves[word_list[0]]))
     for i in range(len(word_list)):
         sum += gloves[word_list[i]]
-    return sum/len(word_list)
+    return sum / len(word_list)
 
 
 def distances(article, articles):
@@ -148,7 +160,7 @@ def distances(article, articles):
     of the elements (tuple) from the articles list.
     """
     article_vector = article[-1]
-    return [(np.linalg.norm(article_vector-a[-1]), a) for a in articles]
+    return [(np.linalg.norm(article_vector - a[-1]), a) for a in articles]
 
 
 def recommended(article, articles, n):
@@ -158,6 +170,6 @@ def recommended(article, articles, n):
     (tuple) from the articles list.
     """
     distance_list = distances(article, articles)
-    #sort distance list by distance from article
-    sorted_distance_list = distance_list.sort(key = lambda x: x[0])
+    # sort distance list by distance from article
+    sorted_distance_list = distance_list.sort(key=lambda x: x[0])
     return sorted_distance_list[:n]
