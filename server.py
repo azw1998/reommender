@@ -5,16 +5,15 @@
 from flask import Flask, render_template
 from doc2vec import *
 import sys
-from jinja2 import Template
 
 app = Flask(__name__)
 
 @app.route("/")
 def articles():
     """Show a list of article titles"""
+    article_links = [article[0] for article in articles]
     article_titles = [article[1] for article in articles]
-
-    return render_template('articles.html', article_titles=article_titles)
+    return render_template('articles.html', article_links=article_links, article_titles=article_titles)
 
 
 @app.route("/article/<topic>/<filename>")
@@ -28,7 +27,7 @@ def article(topic,filename):
             article_paragraphs = article[2].split('\n')
             break
     # TODO make the links correct
-    recommended_links = [topic+article[0] for article in recommended(filename, articles, 5)]
+    recommended_links = [article[0] for article in recommended(filename, articles, 5)]
     recommended_titles = [article[1] for article in recommended(filename, articles, 5)]
 
     return render_template('article.html', article_paragraphs=article_paragraphs,
