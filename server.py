@@ -22,17 +22,20 @@ def article(topic,filename):
     Show an article with relative path filename. Assumes the BBC structure of
     topic/filename.txt so our URLs follow that.
     """
-    for article in articles:
-        if article[0] == filename:
-            article_paragraphs = article[2].split('\n')
-            break
-    # TODO make the links correct
-    recommended_links = [article[0] for article in recommended(filename, articles, 5)]
-    recommended_titles = [article[1] for article in recommended(filename, articles, 5)]
+    title = article[1]
+    text = article[2]
+    article_paragraphs = text.split('\n')
 
-    return render_template('article.html', article_paragraphs=article_paragraphs,
-                                               recommended_links=recommended_links,
-                                               recommended_titles=recommended_titles)
+    recommended_links = []
+    recommended_titles = []
+    # TODO make the links correct
+    for a in recommended(article, articles, 5):
+        topic_filename = a[1][0].split('/')[-2:].join('/')
+        recommended_links.append('/article/{topic_filename}'.format(topic_filename=topic_filename))
+        recommended_titles.append(a[1])
+
+    return render_template('article.html', title=title, article_paragraphs=article_paragraphs,
+                           recommended_links=recommended_links, recommended_titles=recommended_titles)
 
 # initialization
 i = sys.argv.index('server:app')

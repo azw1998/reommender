@@ -63,8 +63,6 @@ def load_glove(filename):
     When computing the vector for each document, use just the text, not the text and title.
     """
     glove = {}
-    word_list = []
-    vector_list = []
     with open(filename, 'r') as file:
         for line in file:
             line_elements = line.split(' ')
@@ -136,7 +134,6 @@ def load_articles(articles_dirname, gloves):
                            text,
                            doc2vec(text, gloves)])
 
-
     return output
 
 
@@ -148,10 +145,9 @@ def doc2vec(text, gloves):
     """
     word_list = words(text)
     sum = np.zeroes(len(gloves[word_list[0]]))
-    for i in range(len(word_list)):
-        sum += gloves[word_list[i]]
+    for word in word_list:
+        sum += gloves[word]
     return sum / len(word_list)
-
 
 def distances(article, articles):
     """
@@ -160,7 +156,7 @@ def distances(article, articles):
     of the elements (tuple) from the articles list.
     """
     article_vector = article[-1]
-    return [(np.linalg.norm(article_vector - a[-1]), a) for a in articles]
+    return [(np.linalg.norm(article_vector - a[-1]), a) for a in articles if a[0] != article_vector[0]]
 
 
 def recommended(article, articles, n):
