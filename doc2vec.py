@@ -122,11 +122,12 @@ def load_articles(articles_dirname, gloves):
     """
     output = []
     filenames = filelist(articles_dirname)
-    txt_filenames = [filename for filename in filenames if filename[:-4] == '.txt']
+    txt_filenames = [filename for filename in filenames if filename[-4:] == '.txt']
 
     for filename in txt_filenames:
-        with open(filename, 'r') as f:
-            file_content = f.read().split('\n', 1)
+        with open(filename, 'r', encoding='unicode_escape', errors='ignore') as f:
+            file_content = f.read()
+            file_content = file_content.split('\n', 1)
             title = file_content[0]
             text = file_content[1]
             output.append([filename,
@@ -143,11 +144,15 @@ def doc2vec(text, gloves):
     for each word and then divide by the number of words. Ignore words
     not in gloves.
     """
+    # TODO word not in glove?
+
     word_list = words(text)
-    sum = np.zeroes(len(gloves[word_list[0]]))
+    sum = np.zeros(len(gloves[next(iter(gloves))]))
     for word in word_list:
-        sum += gloves[word]
+        if word in gloves:
+            sum += gloves[word]
     return sum / len(word_list)
+
 
 def distances(article, articles):
     """
@@ -155,8 +160,8 @@ def distances(article, articles):
     a list of (distance, a) tuples for all a in articles. The article is one
     of the elements (tuple) from the articles list.
     """
-    article_vector = article[-1]
-    return [(np.linalg.norm(article_vector - a[-1]), a) for a in articles if a[0] != article_vector[0]]
+    article_vector = article[3]
+    return [(np.linalg.norm(article_vector - a[3]), a) for a in articles if a[0] != article[0]]
 
 
 def recommended(article, articles, n):
@@ -167,5 +172,15 @@ def recommended(article, articles, n):
     """
     distance_list = distances(article, articles)
     # sort distance list by distance from article
-    sorted_distance_list = distance_list.sort(key=lambda x: x[0])
+    sorted_distance_list = sorted(distance_list, key=lambda x: x[0])
     return sorted_distance_list[:n]
+
+
+if __name__ == '__main__':
+    glove_filename = sys.argv[1]
+    articles_dirname = sys.argv[2]
+
+    gloves = load_glove(glove_filename)
+    articles = load_articles(articles_dirname, gloves)
+
+    print(gloves['dog'])
