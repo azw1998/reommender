@@ -15,9 +15,9 @@ a:hover {
 <body>
 
 <h1 style="">Articles</h1>
-{% for article_title in article_titles%}
-    {% set i = loop.index-1 %}
-    <a href={{article_title}}>{{article_title}}</a>
-
+{% for article in article_list%}
+    {% set i = loop.index-1%}
+    <br><a href={{article_links[i]}}>{{article[1]}}</a>
+{% endfor %}
 </body>
 </html>
