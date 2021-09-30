@@ -67,7 +67,8 @@ def load_glove(filename):
         for line in file:
             line_elements = line.split(' ')
             word = line_elements[0]
-            vector = [float(num) for num in line_elements[1:]]
+            #vector = [float(num) for num in line_elements[1:]]
+            vector = np.array(line_elements[1:])
             glove[word] = vector
 
     return glove
