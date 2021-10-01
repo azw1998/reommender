@@ -62,13 +62,14 @@ def load_glove(filename):
     should not matter; read vectors of any length.
     When computing the vector for each document, use just the text, not the text and title.
     """
+    #word 1 2 3 4 5...
     glove = {}
     with open(filename, 'r') as file:
         for line in file:
             line_elements = line.split(' ')
             word = line_elements[0]
             #vector = [float(num) for num in line_elements[1:]]
-            vector = np.array(line_elements[1:])
+            vector = np.array(line_elements[1:], dtype=float)
             glove[word] = vector
 
     return glove
